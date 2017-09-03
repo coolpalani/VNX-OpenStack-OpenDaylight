@@ -1,0 +1,4 @@
+./create-lxc_ubuntu64-16.04-ostack-compute
+./create-lxc_ubuntu64-16.04-ostack-network
+./create-lxc_ubuntu64-16.04-ostack-controller 
+./create-lxc_ubuntu64-16.04-ostack-opendaylight

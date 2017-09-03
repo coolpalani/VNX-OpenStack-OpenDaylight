@@ -1,0 +1,13 @@
+# Packages
+*.bz2
+*.tar
+*.zip
+
+# VNX root filesystems
+*.qcow2
+
+# Logging leftovers
+*.log
+
+# Others
+*.*~
