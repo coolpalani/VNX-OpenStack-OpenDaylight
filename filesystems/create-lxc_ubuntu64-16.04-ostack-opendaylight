@@ -73,8 +73,9 @@ apt -y dist-upgrade
 echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> /root/.bashrc
 
 # Download ODL Boron
-wget https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/integration/distribution-karaf/0.5.3-Boron-SR3/distribution-karaf-0.5.3-Boron-SR3.tar.gz -P /tmp
-tar xfz /tmp/distribution-karaf-0.5.3-Boron-SR3.tar.gz -C /etc
+# wget https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/integration/distribution-karaf/0.5.3-Boron-SR3/distribution-karaf-0.5.3-Boron-SR3.tar.gz -P /tmp
+wget https://nexus.opendaylight.org/content/repositories/opendaylight.release/org/opendaylight/integration/distribution-karaf/0.5.4-Boron-SR4/distribution-karaf-0.5.4-Boron-SR4.tar.gz -P /tmp
+tar xfz /tmp/distribution-karaf-0.5.4-Boron-SR4.tar.gz -C /etc
 
 sed -i -e '/net\.ipv4\.conf\.all\.rp_filter/d' /etc/sysctl.conf
 sed -i -e '/net\.ipv4\.conf\.default\.rp_filter/d' /etc/sysctl.conf
