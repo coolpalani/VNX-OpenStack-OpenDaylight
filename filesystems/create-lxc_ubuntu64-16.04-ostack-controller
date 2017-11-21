@@ -124,7 +124,8 @@ apt -y install openstack-dashboard
 # ODL
 pip uninstall pbr
 pip install python-keystoneclient
-pip install pbr==0.11.0
+# Hack to fix pbr bug
+pip install pbr 
 git clone https://github.com/openstack/networking-odl.git
 cd networking-odl && git checkout stable/ocata
 python setup.py install
