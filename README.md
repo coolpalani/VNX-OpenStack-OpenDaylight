@@ -1,11 +1,13 @@
 # VNX-OpenStack-OpenDaylight
 
+![OpenStack logo](https://raw.githubusercontent.com/idomingu/VNX-OpenStack-OpenDaylight/master/utils/openstack-logo-2016.png) ![OpenDaylight logo](https://raw.githubusercontent.com/idomingu/VNX-OpenStack-OpenDaylight/master/utils/openyaylight-logo.png)
+
 This project is an extension of [VNX OpenStack Ocata tutorial](https://github.com/davidfdezc/vnx-lab-openstack-ocata/tree/master/openstack_lab-ocata_4n_classic_ovs) where open source SDN platform OpenDaylight is integrated to work as backend of OpenStack's Networking service Neutron.
 
 ## Requirements
 
  - VNX installed [(VNX Installation Guide)](http://web.dit.upm.es/vnxwiki/index.php/Vnx-install-ubuntu3)
- - Operating System: Ubuntu 14.04 / Ubuntu 16.04 (Recommended)
+ - Operating System: Ubuntu 16.04 
 
 ## Installation
 
@@ -28,7 +30,9 @@ For this deployment we are using the following software versions:
 
  - OS (for all nodes): Ubuntu 16.04 LTS
  - OpenStack: Ocata
- - OpenDaylight: Boron SR3
+ - OpenDaylight: Boron SR4
+
+![Boron Diagram](https://raw.githubusercontent.com/idomingu/VNX-OpenStack-OpenDaylight/master/utils/boron-diagrams.png)
 
 ## Usage 
 
