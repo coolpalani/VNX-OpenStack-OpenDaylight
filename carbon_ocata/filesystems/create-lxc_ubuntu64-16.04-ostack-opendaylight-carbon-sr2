@@ -13,17 +13,17 @@
 #           Departamento de Ingenieria de Sistemas Telematicos
 #           Universidad Politecnica de Madrid
 #           SPAIN
-#           
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -31,14 +31,14 @@
 # An online copy of the licence can be found at http://www.gnu.org/copyleft/gpl.html
 #
 
-# 
+#
 # Configuration
 #
 
 
 BASEROOTFSNAME=vnx_rootfs_lxc_ubuntu64-16.04-v025
-ROOTFSNAME=vnx_rootfs_lxc_ubuntu64-16.04-v025-openstack-opendaylight
-ROOTFSLINKNAME="rootfs_lxc_ubuntu64-ostack-opendaylight"
+ROOTFSNAME=vnx_rootfs_lxc_ubuntu64-16.04-v025-openstack-opendaylight-carbon-sr2
+ROOTFSLINKNAME="rootfs_lxc_ubuntu64-ostack-opendaylight-carbon-sr2"
 # General tools
 # 2016-09: removed chrony as it does not work inside a controller
 PACKAGES="aptsh wget iperf traceroute telnet xterm curl ethtool bash-completion wireshark xauth"
@@ -57,7 +57,7 @@ sed -i -e '\$aPATH=\$PATH:~/bin' /root/.bashrc
 # Allow root login by ssh
 sed -i -e 's/^PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-# Set locale to en_US. If set to es_ES a python error related to unicode strings arises when 
+# Set locale to en_US. If set to es_ES a python error related to unicode strings arises when
 # calling "openstack service create..." commands
 echo "LANG=en_US.UTF-8" > /etc/default/locale
 
@@ -72,35 +72,25 @@ apt -y dist-upgrade
 
 echo "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" >> /root/.bashrc
 
-# Download ODL Boron
-# wget https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/integration/distribution-karaf/0.5.3-Boron-SR3/distribution-karaf-0.5.3-Boron-SR3.tar.gz -P /tmp
-wget https://nexus.opendaylight.org/content/repositories/opendaylight.release/org/opendaylight/integration/distribution-karaf/0.5.4-Boron-SR4/distribution-karaf-0.5.4-Boron-SR4.tar.gz -P /tmp
-tar xfz /tmp/distribution-karaf-0.5.4-Boron-SR4.tar.gz -C /etc
+# Download ODL Carbon SR2
+wget https://nexus.opendaylight.org/content/repositories/public/org/opendaylight/integration/distribution-karaf/0.6.2-Carbon/distribution-karaf-0.6.2-Carbon.tar.gz -P /tmp
+tar xfz /tmp/distribution-karaf-0.6.2-Carbon.tar.gz -C /etc
 
-sed -i -e '/net\.ipv4\.conf\.all\.rp_filter/d' /etc/sysctl.conf
-sed -i -e '/net\.ipv4\.conf\.default\.rp_filter/d' /etc/sysctl.conf
-#sed -i -e '/net\.bridge\.bridge-nf-call-iptables/d' /etc/sysctl.conf
-#sed -i -e '/net\.bridge\.bridge-nf-call-ip6tables/d' /etc/sysctl.conf
-echo "# Configured by create-rootfs" >> /etc/sysctl.conf
-echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
-echo "net.ipv4.conf.default.rp_filter=0" >> /etc/sysctl.conf
-#echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
-#echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
-
-# Change libvirt default network (virbr0) addresses to avoid conflicts with the host
-sed -i -e 's/192\.168\.122/192\.168\.123/g' /etc/libvirt/qemu/networks/default.xml
-
-# Add commands to create /dev/kvm and /dev/net/tun devices at startup (/etc/rc.local)
+# Add commands to create /dev/net/tun device at startup (/etc/rc.local)
 sed -i -e "/exit 0/d" /etc/rc.local
 echo "# /dev/net/tun" >> /etc/rc.local
 echo "mkdir -p /dev/net/" >> /etc/rc.local
 echo "mknod -m 666 /dev/net/tun c 10 200" >> /etc/rc.local
 echo "" >> /etc/rc.local
-echo "# /dev/kvm" >> /etc/rc.local
-echo "mknod -m 660 /dev/kvm c 10 232" >> /etc/rc.local
-echo "chown root:kvm /dev/kvm" >> /etc/rc.local
-echo "" >> /etc/rc.local
 echo "exit 0" >> /etc/rc.local
+
+# Configure the kernel to enable packet forwarding and disable reverse path filtering
+sed -i -e '/net\.ipv4\.ip_forward/d' /etc/sysctl.conf
+sed -i -e '/net\.ipv4\.conf\.all\.rp_filter/d' /etc/sysctl.conf
+sed -i -e '/net\.ipv4\.conf\.default\.rp_filter/d' /etc/sysctl.conf
+echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.rp_filter=0" >> /etc/sysctl.conf
 
 EOF
 )
@@ -141,7 +131,7 @@ function create_new_rootfs {
 
   mv ${BASEROOTFSNAME} ../${ROOTFSNAME}
   rm -f ${BASEROOTFSNAME}.tgz
-  cd .. 
+  cd ..
   rmdir $TMPDIR
 
   echo "--"
@@ -175,9 +165,9 @@ function start_and_install_packages {
   lxc-attach -n $ROOTFSNAME -P $CDIR -- bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y install $PACKAGES"
 
   # Create /dev/net/tun device
-  lxc-attach -n $ROOTFSNAME -P $CDIR -- mkdir /dev/net 
-  lxc-attach -n $ROOTFSNAME -P $CDIR -- mknod /dev/net/tun c 10 200 
-  lxc-attach -n $ROOTFSNAME -P $CDIR -- chmod 666 /dev/net/tun 
+  lxc-attach -n $ROOTFSNAME -P $CDIR -- mkdir /dev/net
+  lxc-attach -n $ROOTFSNAME -P $CDIR -- mknod /dev/net/tun c 10 200
+  lxc-attach -n $ROOTFSNAME -P $CDIR -- chmod 666 /dev/net/tun
 
 }
 
@@ -186,7 +176,7 @@ function create_rootfs_tgz {
   echo "Creating rootfs tgz file..."
   rm -f $BASEROOTFSNAME.tgz
   tmpfile=$(mktemp)
-  find ${ROOTFSNAME} -type s > $tmpfile 
+  find ${ROOTFSNAME} -type s > $tmpfile
   #cat $tmpfile
   size=$(du -sb --apparent-size ${ROOTFSNAME} | awk '{ total += $1 - 512; }; END { print total }')
   size=$(( $size * 1020 / 1000 ))
@@ -215,7 +205,7 @@ cd $CDIR
 CDIR=$(pwd)
 
 create_new_rootfs
-start_and_install_packages 
+start_and_install_packages
 customize_rootfs
 lxc-stop -n $ROOTFSNAME -P $CDIR # Stop the VM
 create_rootfs_tgz
