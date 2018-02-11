@@ -54,7 +54,7 @@ Copyright (C) 2017 Departamento de Ingenieria de Sistemas Telematicos (DIT)
     <!-- start-all for configured scenario: only network and compute node steps included -->
     <cmd-seq seq="start-all">step42,step43,step52,step53</cmd-seq>
     <cmd-seq seq="start-odl-nodes">network-odl,compute-odl</cmd-seq>
-    <cmd-seq seq="start-odl">start-karaf,start-odl-controller,start-odl-nodes</cmd-seq>
+    <cmd-seq seq="start-odl">start-odl-controller,start-odl-nodes</cmd-seq>
   </global>
 
   <net name="MgmtNet" mode="openvswitch" mtu="1450"/>
@@ -820,13 +820,15 @@ Copyright (C) 2017 Departamento de Ingenieria de Sistemas Telematicos (DIT)
         cd /etc/distribution-karaf-0.6.2-Carbon
         # Start karaf for installation of features
         ./bin/start
-        sleep 10
+        sleep 20
+        # Install features for OpenStack integration
         ./bin/client -u karaf -h localhost feature:install odl-netvirt-openstack odl-dlux-core odl-mdsal-apidocs
-    </exec>
+        # Use wrapper to run ODL as a service
+        ./bin/client -u karaf -h localhost feature:install wrapper
+        ./bin/client -u karaf -h localhost 'wrapper:install -s AUTO_START -n opendaylight -D "OpenDaylight controller service"'
+        systemctl enable /etc/distribution-karaf-0.6.2-Carbon/bin/opendaylight.service
+        systemctl start opendaylight.service
 
-    <exec seq="start-karaf" type="verbatim">
-        cd /etc/distribution-karaf-0.6.2-Carbon
-        ./bin/start
     </exec>
 
   </vm>
