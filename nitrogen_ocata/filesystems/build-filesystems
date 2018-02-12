@@ -1,0 +1,4 @@
+sudo ./create-lxc_ubuntu64-16.04-ostack-compute
+sudo ./create-lxc_ubuntu64-16.04-ostack-network
+sudo ./create-lxc_ubuntu64-16.04-ostack-controller
+sudo ./create-lxc_ubuntu64-16.04-ostack-opendaylight-carbon-sr2
