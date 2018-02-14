@@ -822,10 +822,10 @@ Copyright (C) 2017 Departamento de Ingenieria de Sistemas Telematicos (DIT)
         ./bin/start
         sleep 20
         # Install features for OpenStack integration
-        ./bin/client -u karaf -h localhost feature:install odl-netvirt-openstack odl-dlux-core odl-mdsal-apidocs
+        ./bin/client feature:install odl-netvirt-openstack odl-dlux-core odl-mdsal-apidocs
         # Use wrapper to run ODL as a service
-        ./bin/client -u karaf -h localhost feature:install wrapper
-        ./bin/client -u karaf -h localhost 'wrapper:install -s AUTO_START -n opendaylight -D "OpenDaylight controller service"'
+        ./bin/client feature:install wrapper
+        ./bin/client 'wrapper:install -s AUTO_START -n opendaylight -D "OpenDaylight controller service"'
         systemctl enable /etc/distribution-karaf-0.7.1-Nitrogen/bin/opendaylight.service
         systemctl start opendaylight.service
 
